@@ -1,0 +1,6 @@
+1. regex to remove underlying symbol "_" and curly braces "{}" : 
+    _\{(\d+)\}
+    $1
+2. to replace space symbol " " to multiplication symbol "*"
+    (x\d+)( )(x\d+)
+    $1 * $3
