@@ -22,6 +22,9 @@ with open("res_GB.txt", 'r') as file:
     lines = file.readlines()
     
 curr_st = vector([_sage_const_1  if '+' in i else _sage_const_0  for i in lines])
+
+print(curr_st)
+
 res = []
 for i in range(_sage_const_500 ):
     curr_st = (C * curr_st)

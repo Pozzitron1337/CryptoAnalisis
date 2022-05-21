@@ -21,8 +21,9 @@ for i in range(500):
         eqs.append(h1(*(curr_st)))
     else:
         eqs.append(h2(*(curr_st)))
-    
-        
+
+for eq in eqs:
+    print(eq)
 
 I = Ideal(eqs)
 GB = I.groebner_basis()

@@ -16,6 +16,9 @@ with open("res_GB.txt", 'r') as file:
     lines = file.readlines()
     
 curr_st = vector([1 if '+' in i else 0 for i in lines])
+
+print(curr_st)
+
 res = []
 for i in range(500):
     curr_st = (C * curr_st)
