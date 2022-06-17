@@ -1,31 +1,40 @@
 from jinja2 import pass_environment
 
-from heys.settings import WORD_LEN
-from .settings import *
+from settings import WORD_LEN
+from settings import *
 
 class Heys:
     def __init__(self):
-        self.__num_keys = 7
+        pass
         
-    # bytes input
     @staticmethod
-    def encrypt(text: str, key: str, num_rounds: int = 6):
-        if len(key) != (num_rounds + 1 ) * BLOCK_LEN and len(text) != BLOCK_LEN:
-            raise Exception()
-        
-        keys = Heys.__split_on_bytes(key)
+    def encrypt(text: str, key: str):
+        """
+        args
+            text - string of binary number. Length = BLOCK_LEN
+            key - string of binary number. Length = KEY_LEN
+        """
+
+        keys = Heys.__split_key(key)
+        print("keys: " + str(keys))
         bytes = Heys.__split_on_bytes(text)
-        
-        for i in range(num_rounds - 1):
-            key_ = key[i*WORD_LEN: (i+1)* WORD_LEN]
-            bytes = Heys.__round(bytes, key_)
-            
-        key_ = [int(i, 2) for i in keys[-1]]
-        return Heys.__whitening(text, key_)
-        
-        
+        print("x = bytes0: " + str(bytes))
+
+        rounds = len(keys) // WORD_LEN - 1 # 
+        for round in range(rounds):
+            bytes = Heys.__round(bytes, keys[round * WORD_LEN : (round + 1) * WORD_LEN])
+            print(f'bytes{round+1}: {bytes}')
+    
+        bytes = Heys.__whitening(bytes, keys[rounds * WORD_LEN : (rounds+1) * WORD_LEN])
+        return bytes
+             
     @staticmethod
-    def __round(text, key):
+    def __round(text: int, key: int):
+        """round function
+        args
+            text - array of 4 bit integer with len WORD_LEN
+            key - array of 4 bit integer with len WORD_LEN
+        """
         return Heys.__permutation(Heys.__substitution(Heys.__whitening(text, key)))
     
     
@@ -33,15 +42,22 @@ class Heys:
     def __whitening(bytes, key):
         return [bytes[i] ^ key[i] for i in range(WORD_LEN)]
     
-    
-    # @staticmethod
-    # def __split_key(key):
-    #     return [Heys.__split_block(key[i: i + BLOCK_LEN]) for i in range(Heys.__num_keys)]
+    @staticmethod
+    def __split_key(key: str):
+        """
+        args
+            key - string of binary number. Length = KEY_LEN
+        """
+        return [int(key[i * WORD_LEN : (i+1) * WORD_LEN], 2) for i in range(len(key)//WORD_LEN)]
     
     
     @staticmethod
     def __split_on_bytes(block):
-        return [int(block[i*WORD_LEN: (i+1)*WORD_LEN], 2) for i in range(WORD_LEN)]
+        """
+        args
+            block - string of binary number. Length = BLOCK_LEN
+        """
+        return [int(block[i * WORD_LEN: (i+1) * WORD_LEN], 2) for i in range(WORD_LEN)]
     
     @staticmethod
     def __permutation(bytes):
