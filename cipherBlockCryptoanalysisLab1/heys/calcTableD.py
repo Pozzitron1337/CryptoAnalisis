@@ -3,6 +3,7 @@ from cypher import Heys
 from random import randrange
 from collections import Counter
 
+
 heys = Heys()
 
 # plainText = "0000111100001111"
@@ -25,7 +26,9 @@ def calcAlpha(alpha, attempt = 1_000_000):
     probabilities = [(i[0],i[1]/totalElements) for i in counter.items()]
     probabilities = sorted(probabilities, key=lambda item : item[1])
     print(probabilities[0:5])
-    #write to file
+    # fd = open('output', 'w')
+    # fd.write(str(probabilities[0:5]))
+
 
 
 
@@ -36,9 +39,20 @@ def bruteforceAlpha():
                 for l in range(16):
                     calcAlpha([i,j,k,l])
 
+def bruteforceDifference(difference):
+    betas = []
+    for i in range(16):
+        for j in range(16):
+            for k in range(16):
+                for l in range(16):
+                    key = [i,j,k,l]
+                    betas.append(heys.round(difference, key))
+    counter = Counter(tuple(item) if type(item) is list else item for item in betas)              
+    print(max([i[1] for i in counter.items()]))
 
-alpha = [0,0,0,1]
-calcAlpha(alpha)
+alpha = [0,0,0,2]
+#calcAlpha(alpha)
+bruteforceDifference(alpha)
 
 # l = [[0,0,0,1],[0,0,0,1],[0,0,0,2]]
 # a = Counter(tuple(item) if type(item) is list else item for item in l)
