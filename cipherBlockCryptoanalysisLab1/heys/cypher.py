@@ -22,14 +22,14 @@ class Heys:
 
         rounds = len(keys) // WORD_LEN - 1 # 
         for round in range(rounds):
-            bytes = Heys.__round(bytes, keys[round * WORD_LEN : (round + 1) * WORD_LEN])
+            bytes = Heys.round(bytes, keys[round * WORD_LEN : (round + 1) * WORD_LEN])
             print(f'bytes{round+1}: {bytes}')
     
         bytes = Heys.__whitening(bytes, keys[rounds * WORD_LEN : (rounds+1) * WORD_LEN])
         return bytes
              
     @staticmethod
-    def __round(text: int, key: int):
+    def round(text: int, key: int):
         """round function
         args
             text - array of 4 bit integer with len WORD_LEN
