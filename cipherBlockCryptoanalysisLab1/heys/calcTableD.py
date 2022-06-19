@@ -13,6 +13,9 @@ heys = Heys()
 # cipherText = heys.encrypt(plainText, key)
 # print(cipherText)
 
+def list_xor(list1, list2):
+    return [x1^x2 for x1, x2 in zip(list1, list2)]
+
 def calcAlpha(alpha, attempt = 1_000_000):
     betas = []
     for i in range(attempt):
@@ -45,12 +48,24 @@ def bruteforceDifference(difference):
         for j in range(16):
             for k in range(16):
                 for l in range(16):
-                    key = [i,j,k,l]
-                    betas.append(heys.round(difference, key))
-    counter = Counter(tuple(item) if type(item) is list else item for item in betas)              
-    print(max([i[1] for i in counter.items()]))
+                    text = [i,j,k,l]
+                    betas.append(
+                        list_xor(
+                            heys.round(
+                                text, 
+                                [0,0,0,0]
+                            ), 
+                            heys.round(
+                                list_xor(text, difference), 
+                                [0,0,0,0]
+                            ) 
+                        )
+                    )
+    counter = Counter(tuple(item) for item in betas)
+    print(f"alpha: {difference}") 
+    print(counter)
 
-alpha = [0,0,0,2]
+alpha = [0,3,0,0]
 #calcAlpha(alpha)
 bruteforceDifference(alpha)
 
