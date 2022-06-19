@@ -62,12 +62,47 @@ def bruteforceDifference(difference):
                         )
                     )
     counter = Counter(tuple(item) for item in betas)
-    print(f"alpha: {difference}") 
-    print(counter)
+    return counter
 
-alpha = [0,3,0,0]
-#calcAlpha(alpha)
-bruteforceDifference(alpha)
+# difference = [0,3,0,0]
+# #calcAlpha(alpha)
+# bruteforceDifference(difference)
+
+def paralelBruteforceDifference():
+    for i in range(4):
+        difference = [0, 0, 0, 0]
+        for j in range(15):
+            difference[i] += 1
+            bruteforceDifference(difference)
+            print()
+
+def diffSearch(alpha):
+    #betas = [tuple(x[0], x[1]/2**16) for x in bruteforceDifference(alpha).items()]
+    betas = [tuple(x.key, x.value / 2**16) for x in bruteforceDifference(alpha)]
+    print("betas:")
+    print(betas)
+    # for beta in betas:
+    #     gammas = bruteforceDifference(beta[0]).most_common(3)
+    #     print("gammas")
+    #     print(gammas)
+    #     # for gamma in gammas:
+    #     #     deltas = bruteforceDifference(gamma[0]).most_common(3)
+    #     #     print("deltas")
+    #     #     print(deltas)
+    #     #     for delta in deltas:
+    #     #         epsilons = bruteforceDifference(delta[0]).most_common(3)
+    #     #         print("epsilons")
+    #     #         print(epsilons)
+    #     #         for epsilon in epsilons:
+    #     #             zetas = bruteforceDifference(epsilon[0]).most_common(3)
+    #     #             print("zetas")
+    #     #             print(zetas)
+    #     #             for zeta
+    
+
+alpha = [0,0,0,1]
+diffSearch(alpha)
+
 
 # l = [[0,0,0,1],[0,0,0,1],[0,0,0,2]]
 # a = Counter(tuple(item) if type(item) is list else item for item in l)
