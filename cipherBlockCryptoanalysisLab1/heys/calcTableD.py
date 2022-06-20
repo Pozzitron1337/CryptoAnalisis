@@ -1,4 +1,4 @@
-from re import L
+from time import time
 from cypher import Heys
 from random import randrange
 from collections import Counter
@@ -73,57 +73,55 @@ def paralelBruteforceDifference():
         difference = [0, 0, 0, 0]
         for j in range(15):
             difference[i] += 1
-            bruteforceDifference(difference)
-            print()
+            # bruteforceDifference(difference)
+            # print()
+            diffSearch(difference, 0.1, 2)
 
 
 
-def diffSearch(alpha, prob):
-    #betas = sorted([tuple([x[0], x[1] / 2**16]) for x in bruteforceDifference(alpha).items()], key=lambda x : -x[1])
-    L = [[],[],[],[],[],[]]
+def diffSearch(alpha, P, r = 7):
+    L = [[],[],[],[],[],[],[]] # len(L) == 7
     L[0] = [tuple([alpha, 1.0])]
-    # f = list(filter(lambda x : x[0] == alpha , L[0] ))[0][1]
-    # print(f)
-    # print([tuple(l[0]) for l in L[0]])
-    # print([0,0,0,1] in [tuple(l[0]) for l in L[0]])
-    # print(L)
-    for t in range(1,6):
+    for t in range(1,r):
         print(t)
         for (beta, p) in L[t-1]:
             gammas = sorted([tuple([x[0], x[1] / 2**16]) for x in bruteforceDifference(beta).items()], key=lambda x : -x[1])
+            print("gammas")
+            print(gammas[:-1])
             for (gamma, q) in gammas:
-                # print(gamma)
-                # print(q)
                 if gamma in [tuple(l[0]) for l in L[t]]:
-                    # print(f'found gamma {(gamma, q)}')
-                    # print(L[t])
                     pg = list(filter(lambda x : x[0] == gamma , L[t]))[0][1]
                     L[t].remove((gamma, pg))
                     L[t].append((gamma, pg + p * q))
                 else:
                     L[t].append(tuple([gamma, p * q]))
         L_t = L[t].copy()
-        # for l in L_t:
-        #     print(l)
-        print(f'L[{t}] len: {len(L[t])}')
+        for l in sorted(L[t],key= lambda x: -x[1])[0:25]:
+            print(l)
+        print(f'L[{t}] len before: {len(L[t])}')
         for (gamma, p) in L[t]:
-            if p <= prob:
-                print(f'removed {(gamma, p)}')
+            if p <= P[t]:
+                #print(f'removed {(gamma, p)}')
                 L_t.remove((gamma, p))
         L[t] = L_t.copy()
-        # for l in L_t:
-        #     print(l)
-        print(f'L[{t}] len: {len(L[t])}')
-    for L_t in L:
-        for l in L_t:
+        for l in sorted(L[t],key= lambda x: -x[1])[0:25]:
+            print(l)
+        print(f'L[{t}] len after: {len(L[t])}')
+       
+    for t in range(len(L)):
+        print(t)
+        for l in L[t]:
             print(l)
         print()
     
-    
 
-alpha = [0,0,0,1]
-prob = 0.00053
-diffSearch(alpha, prob)
+
+
+alpha = [0, 0, 0, 1]
+P = [1, 0.2, 0.0075, 0.0007, 0.0001, 3.05e-05, 3.8e-06]
+diffSearch(alpha, P, r = 7)
+
+#paralelBruteforceDifference()
 
 # L = [(alpha, prob)]
 # L[0] = 1
