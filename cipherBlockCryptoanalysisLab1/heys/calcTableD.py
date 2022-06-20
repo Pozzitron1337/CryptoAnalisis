@@ -122,7 +122,7 @@ def diffSearch(alpha, prob):
     
 
 alpha = [0,0,0,1]
-prob = 0.0012
+prob = 0.00053
 diffSearch(alpha, prob)
 
 # L = [(alpha, prob)]
