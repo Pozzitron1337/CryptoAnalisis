@@ -1,1 +1,1 @@
-from heys import Heys
+from .cypher import Heys
