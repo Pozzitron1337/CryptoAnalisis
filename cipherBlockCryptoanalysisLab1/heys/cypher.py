@@ -129,7 +129,7 @@ class Heys:
     
     @staticmethod
     def substitution_(bytes):
-        return [S_[(bytes[0] >> WORD_LEN) & 0xf] ^ S_[bytes[0] & 0xf], S_[(bytes[1] >> WORD_LEN) & 0xf] ^ S_[bytes[1] & 0xf]]
+        return [(S_[(bytes[0] >> WORD_LEN) & 0xf] << WORD_LEN) ^ S_[bytes[0] & 0xf], (S_[(bytes[1] >> WORD_LEN) & 0xf] << WORD_LEN) ^ S_[bytes[1] & 0xf]]
     
 if __name__ == "__main__" :
     print(Heys.__permutation("0101010101010101"))
