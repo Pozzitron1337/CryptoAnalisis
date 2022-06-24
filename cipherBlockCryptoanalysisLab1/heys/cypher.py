@@ -1,24 +1,22 @@
-from jinja2 import pass_environment
-
-from settings import WORD_LEN
-from settings import *
+from .settings import WORD_LEN
+from .settings import *
 
 class Heys:
     def __init__(self):
         pass
         
     @staticmethod
-    def encrypt(text: str, key: str):
+    def encrypt(bytes, keys):
         """
         args
             text - string of binary number. Length = BLOCK_LEN
             key - string of binary number. Length = KEY_LEN
         """
-
-        keys = Heys.__split_key(key)
-        print("keys: " + str(keys))
-        bytes = Heys.__split_on_bytes(text)
-        print("x = bytes0: " + str(bytes))
+        print(f'bytes{bytes}')
+        # keys = Heys.__split_key(key)
+        # print("keys: " + str(keys))
+        # bytes = Heys.__split_on_bytes(text)
+        # print("x = bytes0: " + str(bytes))
 
         rounds = len(keys) // WORD_LEN - 1 # 
         for round in range(rounds):
@@ -35,7 +33,16 @@ class Heys:
             text - array of 4 bit integer with len WORD_LEN
             key - array of 4 bit integer with len WORD_LEN
         """
-        return Heys.__permutation(Heys.__substitution(Heys.__whitening(text, key)))
+        return Heys.permutation(Heys.substitution(Heys.__whitening(text, key)))
+    
+    @staticmethod
+    def round_(text: int):
+        """round function
+        args
+            text - array of 4 bit integer with len WORD_LEN
+            key - array of 4 bit integer with len WORD_LEN
+        """
+        return Heys.substitution_(Heys.permutation(text))
     
     
     @staticmethod
@@ -59,8 +66,16 @@ class Heys:
         """
         return [int(block[i * WORD_LEN: (i+1) * WORD_LEN], 2) for i in range(WORD_LEN)]
     
+    # @staticmethod
+    # def __permutation(bytes):
+    #     new_text = [0 for i in range(WORD_LEN)]
+    #     for i in range(WORD_LEN):
+    #         for j in range(WORD_LEN):
+    #             new_text[WORD_LEN - 1 - j] |= 0 if Heys.__get_bit(bytes[i], j) == 0 else (1 << (WORD_LEN - 1 - i))
+    #     return new_text
+    
     @staticmethod
-    def __permutation(bytes):
+    def permutation(bytes):
         new_text = [0 for i in range(WORD_LEN)]
         for i in range(WORD_LEN):
             for j in range(WORD_LEN):
@@ -74,8 +89,12 @@ class Heys:
     
     
     @staticmethod
-    def __substitution(bytes):
+    def substitution(bytes):
         return [S[i] for i in bytes]
+    
+    @staticmethod
+    def substitution_(bytes):
+        return [S_[i] for i in bytes]
     
 if __name__ == "__main__" :
     print(Heys.__permutation("0101010101010101"))
