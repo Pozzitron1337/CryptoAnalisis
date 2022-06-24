@@ -10,23 +10,18 @@ def list_xor(list1, list2):
 
 def bruteforceDifference(difference):
     betas = []
-    for i in range(16):
-        for j in range(16):
-            for k in range(16):
-                for l in range(16):
-                    text = [i,j,k,l]
-                    betas.append(
-                        list_xor(
-                            heys.round(
-                                text, 
-                                [0,0,0,0]
-                            ), 
-                            heys.round(
-                                list_xor(text, difference), 
-                                [0,0,0,0]
-                            ) 
-                        )
-                    )
+    for i in range(2**16):
+        text = [(i >> 8) & 0xff, i & 0xff]
+        X = heys.round(
+                text, 
+                [0x00,0x00]
+            )
+        X_ = heys.round(
+            [text[0] ^ difference[0], text[1] ^ difference[1]],
+            [0x00,0x00]
+        ) 
+        betas.append([ X[0] ^ X_[0], X[1] ^ X_[1]])
+
     counter = Counter(tuple(item) for item in betas)
     return counter
 
@@ -36,7 +31,7 @@ def diffSearch(alpha, P, r = 6):
     for t in range(1,r):
         print(t)
         for (beta, p) in L[t-1]:
-            gammas = sorted([tuple([x[0], x[1] / 2**16]) for x in bruteforceDifference(beta).items()], key=lambda x : -x[1])
+            gammas = sorted([tuple([x[0], x[1] / (2**16 * len(L[t-1]))]) for x in bruteforceDifference(beta).items()], key=lambda x : -x[1])
             for (gamma, q) in gammas:
                 if gamma in [tuple(l[0]) for l in L[t]]:
                     pg = list(filter(lambda x : x[0] == gamma , L[t]))[0][1]
@@ -65,8 +60,9 @@ def diffSearch(alpha, P, r = 6):
 
 
 
-alpha = [0, 13, 0, 0]
+alpha = [0x00, 0x03]
 #       1    2       3       4       5         6
 P = [1, 0.1, 0.0075, 0.005, 0.01, 0.001, 3.8e-06]
 P = [0.01]*7
 diffSearch(alpha, P, r = 6)
+#print(bruteforceDifference(alpha))
