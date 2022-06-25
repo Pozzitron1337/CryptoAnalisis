@@ -75,20 +75,20 @@ def bruteforce(alpha_, betas_, keys, texts):
     ctexts = read_ct(texts)
     
     
-    for key in keys:
-        count = 0
-        for text in ctexts:
-            bt = get_beta(text[0], text[1], [(key >> 8) & 0xff, key & 0xff])
-            if bt in betas:
-                count += 1
+    # for key in keys:
+    #     count = 0
+    #     for text in ctexts:
+    #         bt = get_beta(text[0], text[1], [(key >> 8) & 0xff, key & 0xff])
+    #         if bt in betas:
+    #             count += 1
         
-        with open(f'{path}/res/{count}_{key}', 'a') as res_f:
-            res_f.write(f'key: {[key & 0xff, (key >> 8) & 0xff]}, num: {count}\n')
+    #     with open(f'{path}/res/{count}_{key}', 'a') as res_f:
+    #         res_f.write(f'key: {[key & 0xff, (key >> 8) & 0xff]}, num: {count}\n')
     
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-    #     futures = []
-    #     for key in keys:
-    #         futures.append(executor.submit(get_res, ctexts=ctexts, betas=betas, key=key))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        futures = []
+        for key in keys:
+            futures.append(executor.submit(get_res, ctexts=ctexts, betas=betas, key=key))
     
     
 def get_res_on_file():
