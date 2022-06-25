@@ -55,13 +55,13 @@ class Heys:
         return Heys.permutation(Heys.substitution(Heys.__whitening(text, key)))
     
     @staticmethod
-    def round_(text: int):
+    def round_(text, key):
         """round function
         args
             text - array of 4 bit integer with len WORD_LEN
             key - array of 4 bit integer with len WORD_LEN
         """
-        return Heys.substitution_(Heys.permutation(text))
+        return Heys.substitution_(Heys.permutation(Heys.__whitening(text, key)))
     
     
     @staticmethod

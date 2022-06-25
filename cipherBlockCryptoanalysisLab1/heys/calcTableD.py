@@ -1,5 +1,5 @@
 from time import time
-from cypher import Heys
+from .cypher import Heys
 from random import randrange
 from collections import Counter
 

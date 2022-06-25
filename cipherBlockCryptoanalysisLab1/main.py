@@ -7,12 +7,15 @@ from pprint import pprint
 import threading
 import concurrent.futures
 import json
+import os
 
 
-path = '/home/sovun/CryptoAnalisis/cipherBlockCryptoanalysisLab1'
+path = os.path.abspath(os.curdir)
 byteorder = 'big'
-key_ = f'{path}/key.bin'
-# key_ = ""
+# key_ = f'{path}/key.bin'
+key_ = ""
+
+num_key_variants = 20
 
 num_threads = 8
 
@@ -54,40 +57,74 @@ def get_beta(text1_, text2_, key):
     
     return ((t1[0] ^ t2[0]) << 8) ^ t1[1] ^ t2[1] 
 
-def get_res(ctexts, beta, key):
+def get_res(ctexts, betas, key):
     count = 0
     for text in ctexts:
-        bt = get_beta(text[0], text[1], [(key >> 8) & 0xf, key & 0xf])
-        if bt == beta:
+        bt = get_beta(text[0], text[1], [(key >> 8) & 0xff, key & 0xff])
+        if bt in betas:
             count += 1
     
     with open(f'{path}/res/{count}_{key}', 'a') as res_f:
-        res_f.write(f'key: {[key & 0xf, (key >> 8) & 0xf]}, num: {count}\n')
+        res_f.write(f'key: {[key & 0xff, (key >> 8) & 0xff]}, num: {count}\n')
         
-def bruteforce(alpha_, beta_, keys, texts):
+def bruteforce(alpha_, betas_, keys, texts):
     # alpha = unite(alpha_)
-    beta = (beta_[0] << 8) ^ beta_[1]
+    betas = [(beta_[0] << 8) ^ beta_[1] for beta_ in betas_]
     
-    # count = {}
-    # gen_ct(alpha_, texts)
+    gen_ct(alpha_, texts)
     ctexts = read_ct(texts)
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = []
-        for key in keys:
-            futures.append(executor.submit(get_res, ctexts=ctexts, beta=beta, key=key))
+    
+    for key in keys:
+        count = 0
+        for text in ctexts:
+            bt = get_beta(text[0], text[1], [(key >> 8) & 0xff, key & 0xff])
+            if bt in betas:
+                count += 1
+        
+        with open(f'{path}/res/{count}_{key}', 'a') as res_f:
+            res_f.write(f'key: {[key & 0xff, (key >> 8) & 0xff]}, num: {count}\n')
+    
+    # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+    #     futures = []
+    #     for key in keys:
+    #         futures.append(executor.submit(get_res, ctexts=ctexts, betas=betas, key=key))
+    
+    
+def get_res_on_file():
+    files = os.listdir(f"{path}/res")
+    files = [
+        [int(file.split('_')[0]), int(file.split('_')[1])] 
+        for file in files
+    ]
+    
+    files.sort(reverse = True)
+    
+    res_files = files[:num_key_variants]
+    
+    res_ = []
+    for fn in res_files:
+        with open(f'{path}/res/{fn[0]}_{fn[1]}', 'r') as res_f:
+            res_.append(res_f.readline())
+            
+
+    with open(f'{path}/result_of_work', 'a') as res_f:
+        for i in res_:
+            res_f.write(i)
+    
+    
     
 
-# def bf(path, alpha_, beta_, texts):
-#     alpha = unite(alpha_)
-#     beta = unite(beta_)
-
+# def bf(texts):
+#     alpha = [0,1]
 #     count = {}
 #     gen_ct(alpha, texts)
-#     # key = 17546
-#     key = 62097
-#     for text in texts:
-#         bt = get_beta(path, text, key)
+#     ctexts = read_ct(texts)
+#     key = 0x2f38
+#     # key = 0x382f
+#     # key = 62097
+#     for text in ctexts:
+#         bt = get_beta(text[0], text[1], [(key >> 8) & 0xf, key & 0xf])
 #         if bt in count.keys():
 #             count[bt] += 1 
 #         else:
@@ -96,17 +133,35 @@ def bruteforce(alpha_, beta_, keys, texts):
 #     # with open(f'{path}/res_key', 'a') as res_f:
 #     #     res_f.write(f'key: {key}, num: {count[key]}\n')  
                 
-#     return count   
+#     return count
         
 if __name__ == "__main__":
+    # laslo
     alpha = [0, 1]
-    beta = [0, 5]
+    betas = [
+        [1, 1],
+        [0, 1],
+        [1, 16],
+        [16, 17],
+        [16, 0]
+    ]
+    
+    
+    # Ippolit
+    # alpha = [0, 3]
+    # betas = [
+    #     [0, 1],
+    #     [16, 16],
+    #     [1, 1],
+    #     [1, 16],
+    #     [16, 0]
+    # ]
+    
+    
+
     texts = range(1, 1000)
-    keys = range(2**15)
-    # keys = range(2**15)
-    # keys = range(2**15, 2**16)
+    keys = range(1, 2**16)
     
-    bruteforce(alpha, beta, keys, texts)
+    bruteforce(alpha, betas, keys, texts)
     
-    # print(0x2f38)
-    # 12088
+    get_res_on_file()
