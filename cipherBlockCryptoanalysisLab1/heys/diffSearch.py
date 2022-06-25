@@ -1,4 +1,4 @@
-from cypher import Heys
+from .cypher import Heys
 from random import randrange
 from collections import Counter
 
@@ -31,22 +31,27 @@ def diffSearch(alpha, P, r = 6):
     for t in range(1,r):
         print(t)
         for (beta, p) in L[t-1]:
-            gammas = sorted([tuple([x[0], x[1] / (2**16 * len(L[t-1]))]) for x in bruteforceDifference(beta).items()], key=lambda x : -x[1])
+            gammas = sorted([tuple([x[0], x[1] / 2**16]) for x in bruteforceDifference(beta).items()], key=lambda x : -x[1])
             for (gamma, q) in gammas:
-                if gamma in [tuple(l[0]) for l in L[t]]:
-                    pg = list(filter(lambda x : x[0] == gamma , L[t]))[0][1]
-                    L[t].remove((gamma, pg))
-                    L[t].append((gamma, pg + p * q))
+                L_t = L[t].copy()
+                if gamma in [tuple(l[0]) for l in L_t]:
+                    pg = list(filter(lambda x : x[0] == gamma , L_t))[0][1]
+                    L_t.remove((gamma, pg))
+                    L_t.append((gamma, pg + (p * q)))
                 else:
-                    L[t].append(tuple([gamma, p * q]))
-        L_t = L[t].copy()
+                    L_t.append(tuple([gamma, p * q]))
+                L[t] = L_t.copy()
+        
+        print(f'L[{t}] prob: {sum([x[1] for x in L[t]])}')
         for l in sorted(L[t],key= lambda x: -x[1])[0:25]:
             print(l)
         print(f'L[{t}] len before: {len(L[t])}')
+        L_t = L[t].copy()
         for (gamma, p) in L[t]:
             if p <= P[t]:
                 L_t.remove((gamma, p))
         L[t] = L_t.copy()
+        print(f'L[{t}] prob: {sum([x[1] for x in L[t]])}')
         for l in sorted(L[t],key= lambda x: -x[1])[0:25]:
             print(l)
         print(f'L[{t}] len after: {len(L[t])}')
@@ -60,9 +65,9 @@ def diffSearch(alpha, P, r = 6):
 
 
 
-alpha = [0x00, 0x03]
-#       1    2       3       4       5         6
-P = [1, 0.1, 0.0075, 0.005, 0.01, 0.001, 3.8e-06]
-P = [0.01]*7
-diffSearch(alpha, P, r = 6)
+# alpha = [0x00, 0x01]
+# #       1    2       3       4       5         6
+# P = [1, 0.1, 0.0075, 0.005, 0.01, 0.001, 3.8e-06]
+# P = [0.005]*7
+# diffSearch(alpha, P, r = 6)
 #print(bruteforceDifference(alpha))
